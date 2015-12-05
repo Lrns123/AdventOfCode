@@ -24,20 +24,48 @@ struct Coordinate
 
 int main(int, char **)
 {
-    Coordinate pos = { 0, 0 };
+    Coordinate soloPos = { 0, 0 };
+
+    Coordinate santaPos = { 0, 0 };
+    Coordinate roboPos = { 0, 0 };
     char c;
 
-    std::set<Coordinate> houses { pos };
+    bool roboSantaTurn = false;
+
+    std::set<Coordinate> housesVisitedSolo{ {0, 0} };
+    std::set<Coordinate> housesVisitedCoop{ {0, 0} };
 
     while (std::cin >> c)
     {
-        if (c == '^') ++pos.y;
-        if (c == 'v') --pos.y;
-        if (c == '>') ++pos.x;
-        if (c == '<') --pos.x;
+        auto &coopPos = roboSantaTurn ? roboPos : santaPos;
 
-        houses.insert(pos);
+        roboSantaTurn = !roboSantaTurn;
+
+        if (c == '^')
+        {
+            ++soloPos.y;
+            ++coopPos.y;
+        }
+        if (c == 'v')
+        {
+            --soloPos.y;
+            --coopPos.y;
+        }
+        if (c == '>')
+        {
+            ++soloPos.x;
+            ++coopPos.x;
+        }
+        if (c == '<')
+        {
+            --soloPos.x;
+            --coopPos.x;
+        }
+
+        housesVisitedSolo.insert(soloPos);
+        housesVisitedCoop.insert(coopPos);
     }
 
-    std::cout << "Houses visited: " << houses.size() << std::endl;
+    std::cout << "Houses visited alone: " << housesVisitedSolo.size() << std::endl;
+    std::cout << "Houses visited with robo-santa: " << housesVisitedCoop.size() << std::endl;
 }

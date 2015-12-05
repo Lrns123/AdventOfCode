@@ -4,52 +4,37 @@
 #include <string>
 #include <algorithm>
 
-using namespace std;
-
-vector<int> tokenize(string input, char separator)
-{
-    vector<int> result;
-    istringstream stream(input);
-
-    std::string token;
-    while (getline(stream, token, separator))
-        result.emplace_back(stoi(token));
-
-    return move(result);
-}
-
 class Package
 {
-    size_t length;
-    size_t width;
-    size_t height;
+    std::vector<size_t> sides;
+
+    static std::vector<size_t> parse(std::string input)
+    {
+        std::vector<size_t> result;
+        std::istringstream stream(input);
+
+        std::string token;
+        while (getline(stream, token, 'x'))
+            result.emplace_back(stoi(token));
+
+        std::sort(result.begin(), result.end());
+        return result;
+    }
 
 public:
-    explicit Package(string dimensions)
-    {
-        auto tokens = tokenize(dimensions, 'x');
-        length = tokens[0];
-        width = tokens[1];
-        height = tokens[2];
-    }
 
-    size_t surfaceArea() const
-    {
-        return 2 * length * width + 2 * width * height + 2 * height * length;
-    }
-
-    size_t slack() const
-    {
-        const int side1 = length * width;
-        const int side2 = width * height;
-        const int side3 = height * length;
-
-        return min(min(side1, side2), side3);
-    }
+    explicit Package(std::string dimensions)
+        : sides(parse(dimensions))
+    {}
 
     size_t paperRequired() const
     {
-        return surfaceArea() + slack();
+        return 3 * sides[0] * sides[1] + 2 * sides[1] * sides[2] + 2 * sides[2] * sides[0];
+    }
+
+    size_t ribbonRequired() const
+    {
+        return sides[0] + sides[0] + sides[1] + sides[1] + (sides[0] * sides[1] * sides[2]);
     }
 
 };
@@ -58,10 +43,16 @@ public:
 int main(int, char **)
 {
     size_t paperRequried = 0;
+    size_t ribbonRequired = 0;
     
-    string line;
-    while (getline(cin, line))
-        paperRequried += Package(line).paperRequired();
-    
-    cout << "The paper required is: " << paperRequried << " square feet." << endl;
+    std::string line;
+    while (getline(std::cin, line))
+    {
+        Package package(line);
+        paperRequried += package.paperRequired();
+        ribbonRequired += package.ribbonRequired();
+    }   
+
+    std::cout << "Paper required: " << paperRequried << " square feet." << std::endl;
+    std::cout << "Ribbon required: " << ribbonRequired << " square feet." << std::endl;
 }
