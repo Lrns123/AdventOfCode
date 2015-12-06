@@ -1,5 +1,32 @@
 #include "instruction.hpp"
-#include <sstream>
+#include <boost/tokenizer.hpp>
+
+class InstructionTokenizer
+{
+    using tokenizer = boost::tokenizer<boost::char_separator<char>>;
+    tokenizer tokens;
+    tokenizer::const_iterator it;
+
+
+public:
+    InstructionTokenizer(const std::string &input)
+        : tokens(input, boost::char_separator<char>(" ,")),
+          it(tokens.begin())
+    {}
+
+    const std::string &next()
+    {
+        if (++it == tokens.end())
+            throw SyntaxError();
+
+        return *it;
+    }
+
+    const std::string &get() const
+    {
+        return *it;
+    }
+};
 
 Instruction::Instruction(const std::string& instruction)
 {
@@ -53,57 +80,26 @@ const Instruction& Instruction::apply(size_t(& grid)[1000][1000]) const
 
 void Instruction::parse(const std::string& instruction)
 {
-    std::string token;
-    std::istringstream ss(instruction);
+    InstructionTokenizer tokenizer(instruction);
 
-    parseOperator(ss);
-    topLeft = parseCoordinate(ss);
-
-    ss >> token;
-    if (token != "through")
-        throw SyntaxError();
-
-    bottomRight = parseCoordinate(ss);
-}
-
-void Instruction::parseOperator(std::istream& ss)
-{
-    std::string token;
-    ss >> token;
-    if (token == "turn")
+    if (tokenizer.get() == "turn")
     {
-        ss >> token;
-        if (token == "on")
+        if (tokenizer.next() == "on")
             op = TurnOn;
-        else if (token == "off")
+        else if (tokenizer.get() == "off")
             op = TurnOff;
         else throw SyntaxError();
     }
-    else if (token == "toggle")
+    else if (tokenizer.get() == "toggle")
         op = Toggle;
     else throw SyntaxError();
-}
 
-std::vector<size_t> Instruction::splitInts(const std::string& str)
-{
-    std::vector<size_t> ret;
-    std::string token;
-    std::istringstream ss(str);
+    topLeft.x = stoi(tokenizer.next());
+    topLeft.y = stoi(tokenizer.next());
 
-    while (getline(ss, token, ','))
-        ret.push_back(std::stoi(token));
-
-    return ret;
-}
-
-Instruction::Coordinate Instruction::parseCoordinate(std::istream& ss)
-{
-    std::string token;
-    ss >> token;
-
-    auto numbers = splitInts(token);
-    if (numbers.size() != 2)
+    if (tokenizer.next() != "through")
         throw SyntaxError();
 
-    return Coordinate{ numbers[0], numbers[1] };
+    bottomRight.x = stoi(tokenizer.next());
+    bottomRight.y = stoi(tokenizer.next());
 }
