@@ -1,5 +1,4 @@
 #include <string>
-#include <sstream>
 #include <iostream>
 #include <vector>
 #include <atomic>
@@ -18,11 +17,7 @@ static void findHash(const std::string &key, int &first, int &second)
     {
         size_t number = nextNumber++;
 
-        std::ostringstream stream;
-        stream << key << number;
-
-        auto data = stream.str();
-        auto hash = MD5().update(data).final();
+        auto hash = MD5().update(key + std::to_string(number)).final();
 
         if (hash[0] == 0 && hash[1] == 0 && hash[2] >> 4 == 0)
         {
