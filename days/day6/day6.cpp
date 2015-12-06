@@ -31,4 +31,12 @@ int main(int, char **)
     {
         std::cout << "Syntax error occured while parsing '" << line << '\'' << std::endl;
     }    
+    catch (const std::exception &e)
+    {
+        std::cout << "Error occured while parsing '" << line << "\': " << e.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cout << "Unknown error occured while parsing '" << line << '\'' << std::endl;
+    }
 }
