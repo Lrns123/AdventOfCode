@@ -11,6 +11,7 @@ public:
     MD5();
     ~MD5();
 
+    MD5& init();
     MD5& update(const std::string& data);
     std::vector<unsigned char> final();
 };

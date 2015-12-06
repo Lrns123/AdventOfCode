@@ -3,12 +3,18 @@
 MD5::MD5()
 {
     EVP_MD_CTX_init(&ctx);
-    EVP_DigestInit_ex(&ctx, EVP_md5(), nullptr);
+    init();
 }
 
 MD5::~MD5()
 {
     EVP_MD_CTX_cleanup(&ctx);
+}
+
+MD5& MD5::init()
+{
+    EVP_DigestInit_ex(&ctx, EVP_md5(), nullptr);
+    return *this;
 }
 
 MD5& MD5::update(const std::string& data)

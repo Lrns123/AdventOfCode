@@ -13,11 +13,12 @@ static void findHash(const std::string &key, int &first, int &second)
     static std::atomic<bool> finished = false;
     static std::mutex mutex;
 
+    MD5 md5;
     while (!finished)
     {
         size_t number = nextNumber++;
 
-        auto hash = MD5().update(key + std::to_string(number)).final();
+        auto hash = md5.init().update(key + std::to_string(number)).final();
 
         if (hash[0] == 0 && hash[1] == 0 && hash[2] >> 4 == 0)
         {
