@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <array>
 #include <exception>
 
 class InvalidGateException : public std::exception
@@ -11,7 +11,7 @@ public:
 class LogicGate
 {
 protected:
-    std::vector<LogicGate *> m_inputs;
+    std::array<LogicGate *, 2> m_inputs;
     unsigned int m_cached;
 
 public:

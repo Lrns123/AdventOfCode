@@ -1,7 +1,7 @@
 #include "logicgates.hpp"
 
 LogicGate::LogicGate()
-    : m_inputs(2, nullptr), m_cached(-1)
+    : m_inputs(), m_cached(-1)
 {
 }
 
