@@ -3,6 +3,6 @@ project(AdventOfCode)
 
 set (CMAKE_CXX_STANDARD 14)
 
-find_package(OpenSSL REQUIRED)
+find_package(OpenSSL)
 
 add_subdirectory(days)
