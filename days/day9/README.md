@@ -1,4 +1,5 @@
-# Day 9: All in a Single Night
+Day 9: All in a Single Night
+----------------------------
 
 Every year, Santa manages to deliver all of his presents in a single night.
 
@@ -23,7 +24,8 @@ The shortest of these is `London -> Dublin -> Belfast = 605`, and so the answer 
 
 What is the distance of the shortest route?
 
-## Part Two
+Part Two
+--------
 
 The next year, just to show off, Santa decides to take the route with the **longest distance** instead.
 

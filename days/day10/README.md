@@ -1,4 +1,5 @@
-# Day 10: Elves Look, Elves Say
+Day 10: Elves Look, Elves Say
+-----------------------------
 
 Today, the Elves are playing a game called [look-and-say](https://en.wikipedia.org/wiki/Look-and-say_sequence). They take turns making sequences by reading aloud the previous sequence and using that reading as the next sequence. For example, `211` is read as "one two, two ones", which becomes `1221` (`1` `2`, `2` `1`s).
 
@@ -14,7 +15,8 @@ For example:
 
 Starting with the digits in your puzzle input, apply this process 40 times. What is **the length of the result**?
 
-## Part Two
+Part Two
+--------
 
 Neat, right? You might also enjoy hearing [John Conway talking about this sequence](https://www.youtube.com/watch?v=ea7lJkEhytA) (that's Conway of **Conway's Game of Life** fame).
 

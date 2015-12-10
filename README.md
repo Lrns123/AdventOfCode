@@ -1,2 +1,2 @@
-# Solutions for Advent of Code (December 2015)
-http://adventofcode.com
+# Advent of Code - 2015
+Solutions for [Advent of Code](http://adventofcode.com) in C++
