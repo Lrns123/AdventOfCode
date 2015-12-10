@@ -1,32 +1,25 @@
 #include "instruction.hpp"
-#include <boost/tokenizer.hpp>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 
-class InstructionTokenizer
+namespace
 {
-    using tokenizer = boost::tokenizer<boost::char_separator<char>>;
-    tokenizer tokens;
-    tokenizer::const_iterator it;
-
-
-public:
-    InstructionTokenizer(const std::string &input)
-        : tokens(input, boost::char_separator<char>(" ,")),
-          it(tokens.begin())
-    {}
-
-    const std::string &next()
+    std::vector<std::string> splitTokens(std::string line, int reserve = 0)
     {
-        if (++it == tokens.end())
-            throw SyntaxError();
+        replace(line.begin(), line.end(), ',', ' ');
 
-        return *it;
-    }
+        std::vector<std::string> tokens;
+        if (reserve)
+            tokens.reserve(reserve);
 
-    const std::string &get() const
-    {
-        return *it;
+        using Iter = std::istream_iterator<std::string>;
+        std::istringstream ss(line);
+        copy(Iter(ss), Iter(), back_inserter(tokens));
+
+        return tokens;
     }
-};
+}
 
 Instruction::Instruction(const std::string& instruction)
 {
@@ -80,26 +73,30 @@ const Instruction& Instruction::apply(size_t(& grid)[1000][1000]) const
 
 void Instruction::parse(const std::string& instruction)
 {
-    InstructionTokenizer tokenizer(instruction);
+    auto tokens = splitTokens(instruction, 7);
+    size_t currentToken = 0;
 
-    if (tokenizer.get() == "turn")
+    if (tokens.size() < 6)
+        throw SyntaxError();
+
+    if (tokens[currentToken] == "turn")
     {
-        if (tokenizer.next() == "on")
+        if (tokens[++currentToken] == "on")
             op = TurnOn;
-        else if (tokenizer.get() == "off")
+        else if (tokens[currentToken] == "off")
             op = TurnOff;
         else throw SyntaxError();
     }
-    else if (tokenizer.get() == "toggle")
+    else if (tokens[currentToken] == "toggle")
         op = Toggle;
     else throw SyntaxError();
 
-    topLeft.x = stoi(tokenizer.next());
-    topLeft.y = stoi(tokenizer.next());
+    topLeft.x = stoi(tokens[++currentToken]);
+    topLeft.y = stoi(tokens[++currentToken]);
 
-    if (tokenizer.next() != "through")
+    if (tokens[++currentToken] != "through")
         throw SyntaxError();
 
-    bottomRight.x = stoi(tokenizer.next());
-    bottomRight.y = stoi(tokenizer.next());
+    bottomRight.x = stoi(tokens[++currentToken]);
+    bottomRight.y = stoi(tokens[++currentToken]);
 }

@@ -1,5 +1,22 @@
 #include "logicnetwork.hpp"
-#include <boost/tokenizer.hpp>
+#include <vector>
+#include <sstream>
+
+namespace
+{
+    std::vector<std::string> splitTokens(const std::string &line, int reserve = 0)
+    {
+        std::vector<std::string> tokens;
+        if (reserve)
+            tokens.reserve(reserve);
+
+        using Iter = std::istream_iterator<std::string>;
+        std::istringstream ss(line);
+        copy(Iter(ss), Iter(), back_inserter(tokens));
+
+        return tokens;
+    }
+}
 
 LogicNetwork::LogicNetwork()
 {
@@ -7,13 +24,7 @@ LogicNetwork::LogicNetwork()
 
 void LogicNetwork::parseLine(const std::string& line)
 {
-    using Tokenizer = boost::tokenizer<boost::char_separator<char>>;
-    Tokenizer tokenizer(line, boost::char_separator<char>(" "));
-
-    std::vector<std::string> tokens;
-    tokens.reserve(5);
-    for (auto token : tokenizer)
-        tokens.emplace_back(move(token));
+    std::vector<std::string> tokens = splitTokens(line, 5);
 
     if (tokens.size() < 3 || tokens[tokens.size() - 2] != "->")
         throw SyntaxError();
