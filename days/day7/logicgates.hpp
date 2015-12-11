@@ -2,10 +2,10 @@
 #include <array>
 #include <exception>
 
-class InvalidGateException : public std::exception
+class InvalidGateException : public std::runtime_error
 {
 public:
-    InvalidGateException(const char *message) : exception(message) {}
+    explicit InvalidGateException(const char *message) : runtime_error(message) {}
 };
 
 class LogicGate

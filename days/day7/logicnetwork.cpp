@@ -1,6 +1,7 @@
 #include "logicnetwork.hpp"
 #include <vector>
 #include <sstream>
+#include <iterator>
 
 namespace
 {
