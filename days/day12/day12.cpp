@@ -1,23 +1,19 @@
 #include <iostream>
 #include "json/json.h"
 
-int countSum(const Json::Value &value, bool skipRed)
+unsigned countSum(const Json::Value &value, bool skipRed)
 {
     if (value.isInt())
-    {
         return value.asInt();
-    }
 
     if (skipRed && value.isObject())
-    {
-        for (auto it = value.begin(), eit = value.end(); it != eit; ++it)
-            if (*it == "red")
+        for (const auto &entry : value)
+            if (entry == "red")
                 return 0;
-    }
 
-    int sum = 0;
-    for (auto it = value.begin(), eit = value.end(); it != eit; ++it)
-        sum += countSum(*it, skipRed);
+    unsigned sum = 0;
+    for (const auto &entry : value)
+        sum += countSum(entry, skipRed);
 
     return sum;
 }
