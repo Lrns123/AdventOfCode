@@ -85,7 +85,7 @@ int main(int, char **)
         if (regex_match(line, match, pattern))
             visitor.addDistance(match[1].str(), match[2].str(), stoul(match[3].str()));
         else
-            std::cout << "could not parse line '" << line << '\'' << std::endl;
+            std::cout << "Could not parse line '" << line << '\'' << std::endl;
     }
 
     size_t shortest, longest;
