@@ -11,7 +11,6 @@ struct Ingredient
     int calories;
 };
 
-
 bool nextCombination(std::vector<int> &separators)
 {
     size_t idx = separators.size();
@@ -50,7 +49,7 @@ bool nextCombination(std::vector<int> &separators)
 void getQuantities(std::vector<int> &quantities, const std::vector<int> &separators)
 {    
     quantities.front() = separators.front();
-    for (int i = 1; i < separators.size(); ++i)
+    for (size_t i = 1; i < separators.size(); ++i)
         quantities[i] = separators[i] - separators[i - 1];
     
     quantities.back() = 100 - separators.back();
