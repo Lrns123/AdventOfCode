@@ -3,6 +3,6 @@ macro(install_day day)
 	install(FILES input DESTINATION day${day})
 endmacro()
 
-foreach(day RANGE 1 16)
+foreach(day RANGE 1 17)
 	add_subdirectory(day${day})
 endforeach(day)
