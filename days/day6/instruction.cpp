@@ -5,17 +5,15 @@
 
 namespace
 {
-    std::vector<std::string> splitTokens(std::string line, int reserve = 0)
+    std::vector<std::string> splitTokens(std::string line)
     {
         replace(line.begin(), line.end(), ',', ' ');
 
         std::vector<std::string> tokens;
-        if (reserve)
-            tokens.reserve(reserve);
+        tokens.reserve(7);
 
-        using Iter = std::istream_iterator<std::string>;
         std::istringstream ss(line);
-        copy(Iter(ss), Iter(), back_inserter(tokens));
+        copy(std::istream_iterator<std::string>(ss), {}, back_inserter(tokens));
 
         return tokens;
     }
@@ -73,7 +71,7 @@ const Instruction& Instruction::apply(size_t(& grid)[1000][1000]) const
 
 void Instruction::parse(const std::string& instruction)
 {
-    auto tokens = splitTokens(instruction, 7);
+    auto tokens = splitTokens(instruction);
     size_t currentToken = 0;
 
     if (tokens.size() < 6)
@@ -91,12 +89,12 @@ void Instruction::parse(const std::string& instruction)
         op = Toggle;
     else throw SyntaxError();
 
-    topLeft.x = stoi(tokens[++currentToken]);
-    topLeft.y = stoi(tokens[++currentToken]);
+    topLeft.x = stoul(tokens[++currentToken]);
+    topLeft.y = stoul(tokens[++currentToken]);
 
     if (tokens[++currentToken] != "through")
         throw SyntaxError();
 
-    bottomRight.x = stoi(tokens[++currentToken]);
-    bottomRight.y = stoi(tokens[++currentToken]);
+    bottomRight.x = stoul(tokens[++currentToken]);
+    bottomRight.y = stoul(tokens[++currentToken]);
 }

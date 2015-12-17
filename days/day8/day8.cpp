@@ -47,9 +47,7 @@ size_t getMemoryLength(const std::string &string)
 
 int main(int, char **)
 {
-    size_t rawLength = 0;
-    size_t memoryLength = 0;
-    size_t escapedLength = 0;
+    size_t rawLength = 0, memoryLength = 0, escapedLength = 0;
 
     std::string line;
     while (getline(std::cin, line))

@@ -47,7 +47,7 @@ bool matchProperties(const std::map<std::string, int> &properties, bool ignoreOp
 
 int main(int, char**)
 {
-    static std::regex inputRegex("Sue \\d+: (\\w+): (-?\\d+), (\\w+): (-?\\d+), (\\w+): (-?\\d+)");
+    static const std::regex inputRegex("Sue \\d+: (\\w+): (-?\\d+), (\\w+): (-?\\d+), (\\w+): (-?\\d+)");
     std::vector<std::map<std::string, int>> sues;
     
     std::string input;

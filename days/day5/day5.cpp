@@ -68,7 +68,7 @@ bool isReallyNice(const std::string &str)
     // Search non-overlapping pairs
     for (int i = 0, n = str.size() - 1; i < n; ++i)
     {
-        char pattern[2] = { str[i], str[i + 1] };
+        char pattern[2] { str[i], str[i + 1] };
 
         for (int j = i + 2, m = str.size() - 1; j < m; ++j)
             if (str[j] == pattern[0] && str[j + 1] == pattern[1])

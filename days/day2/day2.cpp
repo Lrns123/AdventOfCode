@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <iterator>
 
 class Package
 {
@@ -10,15 +11,11 @@ class Package
 
     static std::vector<size_t> parse(std::string input)
     {
-        std::vector<size_t> result;
-        std::istringstream stream(input);
-
-        std::string token;
-        while (getline(stream, token, 'x'))
-            result.emplace_back(stoi(token));
-
-        std::sort(result.begin(), result.end());
-        return result;
+        replace(input.begin(), input.end(), 'x', ' ');
+        std::istringstream ss(input);
+        std::vector<size_t> ret(std::istream_iterator<size_t>(ss), {});
+        sort(ret.begin(), ret.end());
+        return ret;
     }
 
 public:

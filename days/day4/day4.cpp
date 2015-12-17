@@ -9,8 +9,8 @@
 
 static void findHash(const std::string &key, int &first, int &second)
 {
-    static std::atomic<int> nextNumber = 0;
-    static std::atomic<bool> finished = false;
+    static std::atomic<int> nextNumber(0);
+    static std::atomic<bool> finished(false);
     static std::mutex mutex;
 
     MD5 md5;
@@ -28,17 +28,14 @@ static void findHash(const std::string &key, int &first, int &second)
                 first = number;
 
             if (hash[2] == 0 && second == -1)
-            {
-                second = number;
-                finished = true;    // Finding a match with 6 leading zeroes implies a match with 5 zeroes must also have been found.
-            }
+                second = number, finished = true; // Finding a match with 6 leading zeroes implies a match with 5 zeroes must also have been found.
         }
     }
 }
 
 int main(int, char **)
 {
-    int matches[2] = { -1, -1 };
+    int matches[2] { -1, -1 };
     std::string key;
     std::cin >> key;
 

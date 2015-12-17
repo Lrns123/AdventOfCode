@@ -3,6 +3,7 @@
 #include <regex>
 #include <vector>
 #include <map>
+#include <numeric>
 
 class SeatingSolver
 {
@@ -12,26 +13,22 @@ class SeatingSolver
 public:
     void addPair(const std::string &person, const std::string &neighbour, int happiness)
     {
-        size_t idx1 = idxForName(person);
-        size_t idx2 = idxForName(neighbour);
+        size_t idx1 = idxForName(person), idx2 = idxForName(neighbour);
 
         m_happinessMatrix[idx1][idx2] = happiness;
     }
 
-    void findOptimalHappiness(int &optimal)
+    int findOptimalHappiness()
     {
         size_t numPeople = m_nameToIdx.size();
-        std::vector<size_t> arrangement;
+        std::vector<size_t> arrangement(numPeople);
+        iota(arrangement.begin(), arrangement.end(), 0);
 
-        for (size_t i = 0; i != numPeople; ++i)
-            arrangement.push_back(i);
-
-        optimal = std::numeric_limits<int>::min();
-
+        int optimal = std::numeric_limits<int>::min();
         do
         {
             int happiness = 0;
-            for (int i = 0; i != numPeople; ++i)
+            for (size_t i = 0; i != numPeople; ++i)
             {
                 size_t person = arrangement[i];
                 size_t leftNeighbour = arrangement[i == 0 ? numPeople - 1 : i - 1];
@@ -40,10 +37,12 @@ public:
                 happiness += m_happinessMatrix[person][leftNeighbour];
                 happiness += m_happinessMatrix[person][rightNeighbour];
             }
-            if (happiness > optimal)
-                optimal = happiness;
+            
+            optimal = std::max(happiness, optimal);
+        }
+        while (next_permutation(arrangement.begin(), arrangement.end()));
 
-        } while (next_permutation(arrangement.begin(), arrangement.end()));
+        return optimal;
     }
 
     std::vector<std::string> getNames() const
@@ -77,28 +76,23 @@ private:
     }
 };
 
-static const std::regex pattern("(\\w+) would (gain|lose) (\\d+) happiness units by sitting next to (\\w+).");
 int main(int, char **)
 {
-    using distanceMap = std::map<std::string, std::map<std::string, size_t>>;
-    distanceMap distances;
-
-    std::string line;
-    std::smatch match;
+    static const std::regex pattern("(\\w+) would (gain|lose) (\\d+) happiness units by sitting next to (\\w+).");
+    std::map<std::string, std::map<std::string, size_t>> distances;
     SeatingSolver solver;
 
+    std::string line;
     while (getline(std::cin, line))
     {
+        std::smatch match;
         if (regex_match(line, match, pattern))
             solver.addPair(match[1].str(), match[4].str(), (match[2].str() == "lose" ? -1 : 1) * stoi(match[3].str()));
         else
             std::cout << "Could not parse line '" << line << '\'' << std::endl;
     }
 
-    int optimal = 0;
-    solver.findOptimalHappiness(optimal);
-
-    std::cout << "The total change in happiness for the optimal seating arrangement is: " << optimal << std::endl;
+    std::cout << "The total change in happiness for the optimal seating arrangement is: " << solver.findOptimalHappiness() << std::endl;
 
     for (const auto &name : solver.getNames())
     {
@@ -106,6 +100,5 @@ int main(int, char **)
         solver.addPair(name, "Myself", 0);
     }
 
-    solver.findOptimalHappiness(optimal);
-    std::cout << "When including yourself, the total change in happiness for the optimal seating arrangement is: " << optimal << std::endl;
+    std::cout << "When including yourself, the total change in happiness for the optimal seating arrangement is: " << solver.findOptimalHappiness() << std::endl;
 }

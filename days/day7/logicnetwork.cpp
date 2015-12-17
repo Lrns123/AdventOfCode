@@ -17,8 +17,8 @@ namespace
 
     // Operators
     using ushort = unsigned short;
-    auto opIdent = [](ushort a, ushort b) -> ushort { return a; };
-    auto opNot = [](ushort a, ushort b) -> ushort { return ~a & 0xFFFF; };
+    auto opIdent = [](ushort a, ushort) -> ushort { return a; };
+    auto opNot = [](ushort a, ushort) -> ushort { return ~a & 0xFFFF; };
     auto opAnd = [](ushort a, ushort b) -> ushort { return a & b; };
     auto opOr = [](ushort a, ushort b) -> ushort { return a | b; };
     auto opLShift = [](ushort a, ushort b) -> ushort { return a << b; };

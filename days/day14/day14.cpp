@@ -38,9 +38,7 @@ std::map<std::string, size_t> simulateRace(const std::map<std::string, ReindeerI
         // This should be more efficient than repeatedly calling calculateDistance.
         size_t advance()
         {
-            if (time++ % (info.runTime + info.restTime) < info.runTime)
-                return distance += info.speed;
-            return distance;
+            return time++ % (info.runTime + info.restTime) < info.runTime ? distance += info.speed : distance;
         }
     };
 
@@ -48,7 +46,7 @@ std::map<std::string, size_t> simulateRace(const std::map<std::string, ReindeerI
 
     std::vector<SimulatedReindeer> reindeerList;
     for (const auto &reindeer : map)
-        reindeerList.emplace_back(SimulatedReindeer{ reindeer.first, reindeer.second, 0, 0 });
+        reindeerList.emplace_back(SimulatedReindeer{ reindeer.first, reindeer.second, 0, 0, 0 });
 
     for (size_t time = 0; time != duration; ++time)
     {
@@ -69,13 +67,13 @@ std::map<std::string, size_t> simulateRace(const std::map<std::string, ReindeerI
 
 int main(int, char**)
 {
-    static std::regex inputRegex("(\\w+) can fly (\\d+) km/s for (\\d+) seconds, but then must rest for (\\d+) seconds.");
+    static const std::regex inputRegex("(\\w+) can fly (\\d+) km/s for (\\d+) seconds, but then must rest for (\\d+) seconds.");
     std::map<std::string, ReindeerInfo> reindeerMap;
     
     std::string input;
-    std::smatch match;
     while (getline(std::cin, input))
     {    
+        std::smatch match;
         if (regex_match(input, match, inputRegex))
             reindeerMap.emplace(match[1].str(), ReindeerInfo{ stoul(match[2].str()), stoul(match[3].str()), stoul(match[4].str()) });
         else

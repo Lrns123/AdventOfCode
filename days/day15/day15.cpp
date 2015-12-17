@@ -108,13 +108,13 @@ void findBestScore(const std::vector<Ingredient> &ingredients, long long &bestSc
 
 int main(int, char**)
 {
-    static std::regex inputRegex("\\w+: capacity (-?\\d+), durability (-?\\d+), flavor (-?\\d+), texture (-?\\d+), calories (-?\\d+)");
+    static const std::regex inputRegex("\\w+: capacity (-?\\d+), durability (-?\\d+), flavor (-?\\d+), texture (-?\\d+), calories (-?\\d+)");
     std::vector<Ingredient> ingredients;
     
     std::string input;
-    std::smatch match;
     while (getline(std::cin, input))
     {    
+        std::smatch match;
         if (regex_match(input, match, inputRegex))
             ingredients.emplace_back(Ingredient{ stoi(match[2].str()), stoi(match[3].str()), stoi(match[4].str()), stoi(match[5].str()), stoi(match[6].str()) });
         else
