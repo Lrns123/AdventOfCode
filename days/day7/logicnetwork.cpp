@@ -5,27 +5,36 @@
 
 namespace
 {
-    std::vector<std::string> splitTokens(const std::string &line, int reserve = 0)
+    std::vector<std::string> splitTokens(const std::string &line)
     {
-        std::vector<std::string> tokens;
-        if (reserve)
-            tokens.reserve(reserve);
-
-        using Iter = std::istream_iterator<std::string>;
+        std::vector<std::string> ret;
+        ret.reserve(5);
+        
         std::istringstream ss(line);
-        copy(Iter(ss), Iter(), back_inserter(tokens));
-
-        return tokens;
+        copy(std::istream_iterator<std::string>(ss), {}, back_inserter(ret));
+        return ret;
     }
+
+    // Operators
+    using ushort = unsigned short;
+    auto opIdent = [](ushort a, ushort b) -> ushort { return a; };
+    auto opNot = [](ushort a, ushort b) -> ushort { return ~a & 0xFFFF; };
+    auto opAnd = [](ushort a, ushort b) -> ushort { return a & b; };
+    auto opOr = [](ushort a, ushort b) -> ushort { return a | b; };
+    auto opLShift = [](ushort a, ushort b) -> ushort { return a << b; };
+    auto opRShift = [](ushort a, ushort b) -> ushort { return a >> b; };
+
+    // Default value for LogicGate::memoized.
+    enum : unsigned int { NotMemoized = 0xFFFFFFFF };
 }
 
 LogicNetwork::LogicNetwork()
 {
 }
 
-void LogicNetwork::parseLine(const std::string& line)
+void LogicNetwork::addGate(const std::string& definition)
 {
-    std::vector<std::string> tokens = splitTokens(line, 5);
+    std::vector<std::string> tokens(splitTokens(definition));
 
     if (tokens.size() < 3 || tokens[tokens.size() - 2] != "->")
         throw SyntaxError();
@@ -33,42 +42,24 @@ void LogicNetwork::parseLine(const std::string& line)
     const auto &wireName = tokens.back();
 
     if (tokens.size() == 3)
-    {
         // <a> -> <w>
-        gates[wireName] = std::make_unique<IdentityGate>();
-        setDependencies(wireName, tokens[0]);
-    }
+        m_gates[wireName] = { tokens[0], {}, opIdent, NotMemoized };
     else if (tokens.size() == 4 && tokens[0] == "NOT")
-    {
         // NOT <a> -> <w>
-        gates[wireName] = std::make_unique<NotGate>();
-        setDependencies(wireName, tokens[1]);
-    }
+        m_gates[wireName] = { tokens[1], {}, opNot, NotMemoized };
     else if (tokens.size() == 5)
     {
         // <a> <op> <b> -> <w>
         const auto &op = tokens[1];
 
         if (op == "AND")
-        {
-            gates[wireName] = std::make_unique<AndGate>();
-            setDependencies(wireName, tokens[0], tokens[2]);
-        }
+            m_gates[wireName] = { tokens[0], tokens[2], opAnd, NotMemoized };
         else if (op == "OR")
-        {
-            gates[wireName] = std::make_unique<OrGate>();
-            setDependencies(wireName, tokens[0], tokens[2]);
-        }
+            m_gates[wireName] = { tokens[0], tokens[2], opOr, NotMemoized };
         else if (op == "LSHIFT")
-        {
-            gates[wireName] = std::make_unique<LShiftGate>(stoi(tokens[2]));
-            setDependencies(wireName, tokens[0]);
-        }
+            m_gates[wireName] = { tokens[0], tokens[2], opLShift, NotMemoized };
         else if (op == "RSHIFT")
-        {
-            gates[wireName] = std::make_unique<RShiftGate>(stoi(tokens[2]));
-            setDependencies(wireName, tokens[0]);
-        }
+            m_gates[wireName] = { tokens[0], tokens[2], opRShift, NotMemoized };
         else
             throw SyntaxError();
     }
@@ -77,50 +68,28 @@ void LogicNetwork::parseLine(const std::string& line)
 
 }
 
-void LogicNetwork::resolve()
-{
-    for (auto &entry : dependencyTable)
-    {
-        auto &gate = gates.at(entry.first);
-        auto &dependencies = entry.second;
-
-        if (!dependencies.first.empty())
-            gate->setInput(0, getGate(dependencies.first));
-
-        if (!dependencies.second.empty())
-            gate->setInput(1, getGate(dependencies.second));
-    }
-}
-
 void LogicNetwork::reset()
 {
-    for (auto &gate : gates)
-        gate.second->resetCache();
+    for (auto &gate : m_gates)
+        gate.second.memoized = NotMemoized;
 }
 
-unsigned short LogicNetwork::evaluate(const std::string& wire) const
+unsigned short LogicNetwork::evaluate(const std::string& wire)
 {
-    return gates.at(wire)->evaluate();
-}
+    if (wire.empty())
+        return 0;
 
-void LogicNetwork::setDependencies(const std::string& gate, const std::string& input)
-{
-    dependencyTable[gate] = std::make_pair(input, std::string());
-}
+    if (isdigit(wire.front()))
+        return stoul(wire) & 0xFFFF;
 
-void LogicNetwork::setDependencies(const std::string& gate, const std::string& input1, const std::string &input2)
-{
-    dependencyTable[gate] = std::make_pair(input1, input2);
-}
-
-LogicGate* LogicNetwork::getGate(const std::string& name)
-{
-    auto it = gates.find(name);
-    if (it != gates.end())
-        return it->second.get();
-
-    if (isdigit(name.front()))
-        return (gates[name] = std::make_unique<ConstantGate>(stoi(name))).get();
+    auto it = m_gates.find(wire);
+    if (it == m_gates.end())
+        throw std::runtime_error("Cannot find gate " + wire);
     
-    throw InvalidGateException("Cannot find gate");
+    auto &gate = it->second;
+    if (gate.memoized != NotMemoized)
+        return gate.memoized;
+
+    return gate.memoized = gate.op(evaluate(gate.operands[0]), evaluate(gate.operands[1]));
 }
+

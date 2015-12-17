@@ -1,27 +1,25 @@
 #pragma once
 #include <map>
-#include <memory>
-#include "logicgates.hpp"
 
 class SyntaxError
 {};
 
 class LogicNetwork
 {
-    std::map<std::string, std::unique_ptr<LogicGate>> gates;
-    std::map<std::string, std::pair<std::string, std::string>> dependencyTable;
+    struct LogicGate
+    {
+        std::string operands[2];
+        unsigned short(*op)(unsigned short, unsigned short);
+        unsigned int memoized;
+    };
+
+    std::map<std::string, LogicGate> m_gates;
 
 public:
     LogicNetwork();
 
-    void parseLine(const std::string &line);
-    void resolve();
+    void addGate(const std::string &definition);
     void reset();
 
-    unsigned short evaluate(const std::string &wire) const;
-
-private:
-    void setDependencies(const std::string &gate, const std::string &input);
-    void setDependencies(const std::string &gate, const std::string &input1, const std::string &input2);
-    LogicGate *getGate(const std::string& name);
+    unsigned short evaluate(const std::string &wire);
 };
