@@ -31,20 +31,15 @@ namespace
         { "Platemail",  102, 0, 5 },
     };
 
-    const Item offensiveRings[]
+    const Item rings[]
     {
-        { "None",      0,   0, 0 },
-        { "Damage +1", 25,  1, 0 },
-        { "Damage +2", 50,  2, 0 },
-        { "Damage +3", 100, 3, 0 },
-    };
-
-    const Item defensiveRings[]
-    {
-        { "None",       0,  0, 0 },
-        { "Defence +1", 20, 0, 1 },
-        { "Defence +2", 40, 0, 2 },
-        { "Defence +3", 80, 0, 3 },
+        { "None",       0,   0, 0 },
+        { "Damage +1",  25,  1, 0 },
+        { "Damage +2",  50,  2, 0 },
+        { "Damage +3",  100, 3, 0 },
+        { "Defence +1", 20,  0, 1 },
+        { "Defence +2", 40,  0, 2 },
+        { "Defence +3", 80,  0, 3 },
     };
 
     struct Stats
@@ -95,12 +90,15 @@ int main(int, char **)
 
     for (const auto &weapon : weapons)
         for (const auto &armor : armors)
-            for (const auto &offRing : offensiveRings)
-                for (const auto &defRing : defensiveRings)
+            for (const auto &ring1 : rings)
+                for (const auto &ring2 : rings)
                 {
-                    unsigned cost = weapon.cost + armor.cost + offRing.cost + defRing.cost;
-                    unsigned damage = weapon.damage + armor.damage + offRing.damage + defRing.damage;
-                    unsigned defence = weapon.armor + armor.armor + offRing.armor + defRing.armor;                 
+                    if (&ring1 != &rings[0] && &ring1 == &ring2)
+                        continue;
+
+                    unsigned cost = weapon.cost + armor.cost + ring1.cost + ring2.cost;
+                    unsigned damage = weapon.damage + armor.damage + ring1.damage + ring2.damage;
+                    unsigned defence = weapon.armor + armor.armor + ring1.armor + ring2.armor;
 
                     if (simulateFight({ 100, damage, defence }, bossStats))
                         minCost = std::min(minCost, cost);
