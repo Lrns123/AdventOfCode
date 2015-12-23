@@ -1,20 +1,22 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <algorithm>
 
-std::string lookAndSay(const std::string &input)
+void lookAndSay(std::vector<char> &input)
 {
-    std::string ret;
+    std::vector<char> ret;
     ret.reserve(input.size() << 1);
 
-    char currentCh = input[0];
-    size_t count = 0;  // Intentionally start at zero to stop the first character being counted twice.
+    char currentCh = input.front();
+    char count = 0;  // Intentionally start at zero to stop the first character being counted twice.
 
     for (char ch : input)
     {
         if (ch != currentCh)
         {
-            ret += static_cast<char>('0' + count);  // Wrapped in a cast to suppress narrowing conversion warning.
-            ret += currentCh;
+            ret.emplace_back(count); 
+            ret.emplace_back(currentCh);
 
             currentCh = ch;
             count = 1;
@@ -23,24 +25,27 @@ std::string lookAndSay(const std::string &input)
             ++count;
     }
 
-    ret += static_cast<char>('0' + count);
-    ret += currentCh;
+    ret.emplace_back(count);
+    ret.emplace_back(currentCh);
 
-    return ret;
+    swap(input, ret);
 }
 
 int main(int, char **)
 {
     std::string input;
     std::cin >> input;
+    
+    std::vector<char> inputVec(input.size());
+    std::transform(input.begin(), input.end(), inputVec.begin(), [](char ch) { return ch - '0'; });
 
     for (size_t i = 0; i != 40; ++i)
-        input = lookAndSay(input);
+        lookAndSay(inputVec);
 
-    std::cout << "Length of result after 40 iterations: " << input.length() << std::endl;
+    std::cout << "Length of result after 40 iterations: " << inputVec.size() << std::endl;
 
     for (size_t i = 0; i != 10; ++i)
-        input = lookAndSay(input);
+        lookAndSay(inputVec);
 
-    std::cout << "Length of result after 50 iterations: " << input.length() << std::endl;
+    std::cout << "Length of result after 50 iterations: " << inputVec.size() << std::endl;
 }
