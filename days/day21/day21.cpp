@@ -65,7 +65,7 @@ namespace
 int main(int, char **)
 {
     static const std::regex inputRegex("(.+): (\\d+)");
-    Stats bossStats;
+    Stats bossStats {0, 0, 0};
 
     std::string line;
     while (getline(std::cin, line))
